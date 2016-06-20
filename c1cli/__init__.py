@@ -6,10 +6,13 @@ import requests
 
 
 class Client:
-    def __init__(self, token):
-        self.token = token
+    def __init__(self):
+        self.token = None
         self.host = "https://ch-message-processor-test.azurewebsites.net/"
         self.version = "v1"
+
+    def init_app(self, app):
+        self.token = app.config['CHATFIRST_USERTOKEN']
 
     def get(self, method, params=None, headers=None):
         h = dict() if headers is None else headers
@@ -44,7 +47,7 @@ class Client:
             raise ClientException("{method}: Bad Core POST status code".format(method=method), res.status_code)
         return res.json()
 
-    def put(self, method, data=None, json=None, headers=None, params=None):
+    def put(self, method, json=None, headers=None, params=None):
         h = dict() if headers is None else headers
         h['Authorization'] = "Basic {token}".format(token=b64encode(self.token + ":"))
         h["Content-Type"] = "application/json"
@@ -52,11 +55,11 @@ class Client:
         url = self.host + self.version + method
 
         try:
-            res = requests.put(url, data=data, json=json, params=params, headers=h)
+            res = requests.put(url, json=json, params=params, headers=h)
         except:
             raise ClientException("Unable to perform Core PUT request", 400)
 
-        if res.status_code not in [200]:
+        if res.status_code not in [200, 202, 204]:
             print res.text
             raise ClientException("{method}: Bad Core PUT status code".format(method=method), res.status_code)
         return res.json()
@@ -73,7 +76,7 @@ class Client:
         except:
             raise ClientException("Unable to perform Core DELETE request", 400)
 
-        if res.status_code != 200:
+        if res.status_code not in [200, 204]:
             print res.text
             raise ClientException("{method}: Bad Core DELETE status code".format(method=method), res.status_code)
         return res.json()

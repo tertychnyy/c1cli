@@ -93,7 +93,7 @@ def update(client=None, bot=None):
     except:
         raise ClientException("Illegal Bot obj", 400)
 
-    data = client.put(_method, data=bot.to_json())
+    data = client.put(_method, json=bot.to_json())
 
     # Prepare retval list
     retval = Bot(data)

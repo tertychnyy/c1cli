@@ -7,15 +7,17 @@ class ActionResponse(object):
         self.messages = []
         self.forced = None
         self.keyboard = None
-        self.entities = None
+        self.entities = []
 
     def to_dict(self):
-        res = {}
+        res = dict()
         res['Count'] = self.count
         res['Messages'] = self.messages
         res['ForcedState'] = self.forced
         res['ForcedKeyboard'] = self.keyboard
-        res['Entities'] = self.entities
+        res['Entities'] = list()
+        for item in self.entities:
+            res['Entities'].append(item.to_dict())
         return res
 
 
@@ -26,23 +28,20 @@ class ErrorResponse(ActionResponse):
 
 
 class LinkedEntity:
-    def __init__(self, d):
-        self.name = d['name']  # Name of file
-        self.desc = d['desc']  # Description of pic
-        self.url = d['url'] # URL
+    def __init__(self):
+        self.name = None
+        self.desc = None
+        self.url = None
+        self.options = list()
 
     def __str__(self):
-        d = dict()
-        d['Handle'] = None
-        d['Name'] = self.name
-        d['ImageUrl'] = self.url
-        d['Description'] = self.desc
-        return json.dumps(d)
+        return json.dumps(self.to_dict())
 
     def to_dict(self):
-        res = {}
+        res = dict()
         res['Handle'] = ''
         res['Name'] = self.name
         res['ImageUrl'] = self.url
         res['Description'] = self.desc
+        res["EntityOptions"] = self.options
         return res
