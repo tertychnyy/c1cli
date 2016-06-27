@@ -30,6 +30,20 @@ def push(token, botname, userid, obj, channel):
         print res.text
         return res.status_code == 200
 
+    if channel == 'facebook':
+        headers = dict()
+        headers['Authorization'] = "Basic {token}".format(token=b64encode(token + ":"))
+        headers["Content-Type"] = "application/json"
+        data = obj.to_dict()
+        params = dict()
+        params["id"] = userid
+        params["channel"] = channel
+
+        res = requests.post("https://ch-message-processor-test.azurewebsites.net/v1/push/{botname}".format(botname=botname),
+                        headers=headers, data=json.dumps(data), params=params)
+        print res.text
+        return res.status_code == 200
+
     if channel == 'sms':
         url = 'http://ch-utility.azurewebsites.net/api/v1/send/sms'
         headers = {"Content-Type": "application/json"}
